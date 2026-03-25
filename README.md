@@ -6,7 +6,7 @@
 
 | Component | Version |
 |-----------|---------|
-| **MCU** | TI CC3220SF (Cortex-M4 + integrated WiFi NWP) |
+| **MCU** | TI CC3220SF (Cortex-M4 + integrated WiFi NWP), P/N: CC3220SF23ARGKT |
 | **SDK** | SimpleLink CC32xx SDK 7.10.00.13 |
 | **RTOS** | TI-RTOS 7 (SYS/BIOS) |
 | **Compiler** | TI Clang ARM LLVM 2.1.3.LTS |
