@@ -1,10 +1,10 @@
 # SimpleLink CC32xx Host Driver - Thread Safety Fixes
 
-**Submitted by:** Radical Electronic Systems
-**Date:** 2026-03-25
-**SDK Version:** SimpleLink CC32xx SDK 7.10.00.13
-**Platform:** CC3220SF, TI-RTOS 7 (SYS/BIOS), TI Clang ARM LLVM 2.1.3.LTS
-**Affected Files:** `source/ti/drivers/net/wifi/source/driver.c`, `source/ti/drivers/net/wifi/source/spawn.c`
+-**Submitted by:** Radical Electronic Systems
+-**Date:** 2026-03-25
+-**SDK Version:** SimpleLink CC32xx SDK 7.10.00.13
+-**Platform:** CC3220SF, TI-RTOS 7 (SYS/BIOS), TI Clang ARM LLVM 2.1.3.LTS
+-**Affected Files:** `source/ti/drivers/net/wifi/source/driver.c`, `source/ti/drivers/net/wifi/source/spawn.c`
 
 ## Summary
 
