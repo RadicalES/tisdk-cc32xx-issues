@@ -1,8 +1,8 @@
 # SPI WiFi Driver Thread Safety Analysis
 
-**Date:** 2026-03-25
-**Firmware:** v3.7.3
-**Scope:** `tifw/net/wifi/source/` - SimpleLink NWP SPI communication layer
+- **Date:** 2026-03-25
+- **Firmware:** v3.7.3
+- **Scope:** `tifw/net/wifi/source/` - SimpleLink NWP SPI communication layer
 
 ## Overview
 
