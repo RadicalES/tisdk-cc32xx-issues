@@ -1,11 +1,19 @@
 # SimpleLink CC32xx SDK - Reliability & Thread Safety Issues
 
-**Platform:** TI CC3220SF (Cortex-M4 + WiFi NWP)
-**SDK:** SimpleLink CC32xx SDK 7.10.00.13
-**RTOS:** TI-RTOS 7 (SYS/BIOS)
-**Compiler:** TI Clang ARM LLVM 2.1.3.LTS
-
 **E2E Forum Thread:** [CC3220SF - SPI comms to WiFi CoCPU unreliable](https://e2e.ti.com/support/wireless-connectivity/wi-fi-group/wifi/f/wi-fi-forum/1628553/cc3220sf-spi-comms-to-wifi-cocpu-unreliable)
+
+## SDK & Toolchain
+
+| Component | Version |
+|-----------|---------|
+| **MCU** | TI CC3220SF (Cortex-M4 + integrated WiFi NWP) |
+| **SDK** | SimpleLink CC32xx SDK 7.10.00.13 |
+| **RTOS** | TI-RTOS 7 (SYS/BIOS) |
+| **Compiler** | TI Clang ARM LLVM 2.1.3.LTS |
+| **IDE** | Code Composer Studio (CCS) 12.3.0 |
+| **NWP Service Pack** | Included with SDK 7.10.00.13 |
+
+All issues documented here are against the **SimpleLink CC32xx SDK 7.10.00.13** release. The affected source files are located under `<SDK_INSTALL>/source/ti/drivers/net/wifi/source/` in the SDK distribution.
 
 ## Background
 
