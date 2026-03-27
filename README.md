@@ -43,6 +43,10 @@ Four concrete patches to `driver.c` and `spawn.c` with full before/after code, r
 3. Protect `ApiInProgressCnt` read in `_SlDrvIsApiInProgress()` with lock
 4. Mark spawn IRQ counters as `volatile`
 
+### [SlWifiConn Module Modifications](slwificonn-modifications.md)
+
+Modifications to the `slwificonn.c` connection manager required for stable production operation. Includes timer thread stack overflow fix, exponential backoff on NWP reset, WiFi statistics collection, WLAN profile checking, connected-state reset request, and power policy changes.
+
 ### [SPI Driver Error Analysis](cc3220sf-spi-driver-errors.md)
 
 Analysis of the fatal error types (`SYNC_LOSS`, `DRIVER_ABORT`, `NO_CMD_ACK`, `CMD_TIMEOUT`, `DEVICE_ABORT`), their code paths in `driver.c`, and observed error patterns. Includes analysis of conflict between `sl_DeviceStatStart/Get/Stop` APIs and concurrent socket operations.
