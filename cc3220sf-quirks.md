@@ -9,7 +9,8 @@ We used it as below:
 #define NWP_STATS_REG_RECOVER  (OCP_SHARED_BASE + OCP_SHARED_O_SPARE_REG_7)
 #define NWP_STATS_REG_DISCON   (OCP_SHARED_BASE + OCP_SHARED_O_SPARE_REG_6)
 ```
-WARNING: Writing to OCP_SHARED registers during NWP operation causes
+### WARNING: 
+Writing to OCP_SHARED registers during NWP operation causes
 NWP power-down/up cycles and instability. Registers 0-5 are reserved
 by NWP/ITM. Registers 6-8 can be read after sl_Start but must NOT be
 written while the NWP is running.
