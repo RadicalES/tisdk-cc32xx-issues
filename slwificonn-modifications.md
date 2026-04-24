@@ -128,3 +128,59 @@ typedef struct {
 - Sets `SL_WLAN_LOW_LATENCY_POLICY` at init in `SlWifiConn_init()`
 - Also reapplied after every NWP reset in `ResetNWP()`
 - Trade-off: Higher power consumption for improved SPI communication reliability
+
+---
+
+## 8. AP Mode Reset for Profile Deletion (`ResetNWP2AP`)
+
+**Problem:** Deleting WiFi profiles via `sl_WlanProfileDel(SL_WLAN_DEL_ALL_PROFILES)` while the NWP is in STA mode leaves the NWP in a corrupted state. Subsequent calls to `sl_WlanProvisioning()` crash the NWP, causing an infinite reboot loop that requires a full reflash to recover.
+
+**Root cause:** The NWP's internal state is not fully cleaned when profiles are deleted in STA mode. The TI out-of-box example (`provisioning_task.c`) demonstrates that profiles must be deleted while the NWP is in AP mode.
+
+**New function `ResetNWP2AP()`:**
+1. `sl_Stop()` — stop NWP
+2. `sl_Start()` — restart
+3. `sl_WlanSetMode(ROLE_AP)` — switch to AP mode (stop/start if needed)
+4. `sl_WlanProfileDel(0xFF)` — delete all profiles while in AP mode
+5. `sl_WlanPolicySet()` — set connection policy to Auto
+6. `sl_Stop()` — stop NWP (caller restarts in STA mode)
+
+**Integration:**
+- `SlWifiConn_init()` accepts new `deleteProfiles` parameter
+- When true (button provisioning requested), calls `ResetNWP2AP()` before the profile count check, then restarts with `sl_Start()`
+- Profile check finds 0 profiles → provisioning starts via normal path
+- No `FORCE_PROVISIONING` flag needed — profiles are already cleanly deleted
+
+---
+
+## 9. SlWifiConn_init API Change
+
+**Change:** `SlWifiConn_init(SlWifiConn_AppEventCB_f fWifiAppCB)` now accepts an additional parameter:
+
+```c
+int SlWifiConn_init(SlWifiConn_AppEventCB_f fWifiAppCB, uint8_t deleteProfiles);
+```
+
+When `deleteProfiles` is non-zero, `ResetNWP2AP()` runs before the profile check to ensure clean provisioning. The application passes `board_is_provisioning()` which returns true when the physical button (B1+B4) was pressed at boot.
+
+---
+
+## 10. SlWifiConn_setDeleteAllProfiles API
+
+**New function:** Sets the `bDeleteAllProfiles` flag in the SlWifiConn context for use by the ENABLE event handler.
+
+```c
+void SlWifiConn_setDeleteAllProfiles(void);
+```
+
+This is an alternative to `SLWIFICONN_PROV_FLAG_FORCE_PROVISIONING` that can be called before `SlWifiConn_enable()`. Not currently used in production — `ResetNWP2AP()` in init is the preferred approach.
+
+---
+
+## Known Limitations
+
+### Re-provisioning After Bad Credentials (Without Button)
+
+If the device boots with no profiles (e.g., after a web-based profile reset) but without the physical button press, provisioning may fail. The `ResetNWP2AP` cycle only runs when `deleteProfiles` is true (button pressed). Without it, `sl_WlanProvisioning()` is called on a potentially dirty NWP and crashes.
+
+**Workaround:** Always use the physical button (B1+B4) to trigger re-provisioning. The web-based "Reset WiFi" button deletes profiles but requires a subsequent button press to enter provisioning cleanly.
