@@ -578,13 +578,25 @@ int ResetNWP()
     return retVal;
 }
 
-static int ResetNWP2AP()
+//*****************************************************************************
+//
+//! \brief  Reset NWP profiles for clean provisioning entry.
+//!
+//!         Stops the NWP, restarts in AP mode, deletes all stored WiFi
+//!         profiles, sets connection policy, then stops again. The caller
+//!         must restart the NWP with sl_Start() after this function returns.
+//!
+//!         Based on TI out_of_box provisioning_task.c pattern — profiles
+//!         must be deleted while the NWP is in AP mode. Deleting in STA
+//!         mode leaves the NWP in a corrupt state that causes
+//!         sl_WlanProvisioning() to crash on subsequent calls.
+//!
+//! \return 0 on success, negative error code on failure
+//
+//*****************************************************************************
+static int ResetNWPProfileForProvisioning(void)
 {
     int retVal;
-
-    /* Stop NWP and restart in AP mode for clean profile deletion.
-     * Based on TI out_of_box provisioning_task.c pattern —
-     * profiles must be deleted while NWP is in AP mode. */
     retVal = sl_Stop(SL_STOP_TIMEOUT);
     sleep(2);
 
@@ -1968,7 +1980,7 @@ int SlWifiConn_init(SlWifiConn_AppEventCB_f fWifiAppCB, uint8_t deleteProfiles)
      /* Reset NWP to AP mode, delete all profiles, then stop.
       * Restart in STA mode for the profile check and normal operation. */
      if(deleteProfiles) {
-         ResetNWP2AP();
+         ResetNWPProfileForProvisioning();
          sl_Start(0, 0, 0);
      }
 

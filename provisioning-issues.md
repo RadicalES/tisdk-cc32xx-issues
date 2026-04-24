@@ -122,5 +122,5 @@ Provisioning Trigger: Physical button (B1+B4) at boot
 
 ## Files
 
-- `slwificonn.c` — Modified SlWifiConn with `ResetNWP2AP()` function
+- `slwificonn.c` — Modified SlWifiConn with `ResetNWPProfileForProvisioning()` function
 - `slwificonn.h` — Updated `SlWifiConn_init` signature with `deleteProfiles` parameter
