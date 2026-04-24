@@ -578,6 +578,48 @@ int ResetNWP()
     return retVal;
 }
 
+static int ResetNWP2AP()
+{
+    int retVal;
+
+    /* Stop NWP and restart in AP mode for clean profile deletion.
+     * Based on TI out_of_box provisioning_task.c pattern —
+     * profiles must be deleted while NWP is in AP mode. */
+    retVal = sl_Stop(SL_STOP_TIMEOUT);
+    sleep(2);
+
+    retVal = sl_Start(0, 0, 0);
+    if(retVal < 0) return retVal;
+
+    /* Switch to AP mode if not already */
+    if(ROLE_AP != retVal)
+    {
+        sl_WlanSetMode(ROLE_AP);
+        sl_Stop(SL_STOP_TIMEOUT);
+        sleep(1);
+        retVal = sl_Start(0, 0, 0);
+        if(ROLE_AP != retVal)
+        {
+            g_fDebugPrint("SlWifiConn: Failed to enter AP mode (%d)\n\r", retVal);
+            return -1;
+        }
+    }
+
+    /* Delete profiles while in AP mode */
+    sl_WlanProfileDel(SL_WLAN_DEL_ALL_PROFILES);
+    g_fDebugPrint("SlWifiConn: Profiles deleted in AP mode\n\r");
+
+    /* Set connection policy to Auto */
+    sl_WlanPolicySet(SL_WLAN_POLICY_CONNECTION,
+                     SL_WLAN_CONNECTION_POLICY(1, 0, 0, 0), NULL, 0);
+
+    /* Stop NWP — the normal init flow will restart it in STA mode */
+    sl_Stop(SL_STOP_TIMEOUT);
+    sleep(1);
+
+    return 0;
+}
+
 //*****************************************************************************
 //
 //! \brief  Sets WLAN Role (+ NWP reset), stores the active role
@@ -808,6 +850,12 @@ static int NotifyProvisioningStatus(WifiConnProvStatus_e status)
     data.status = status;
     NotifyWifiApp(WifiConnEvent_PROVISIONING_STOPPED, &data);
     return 0;
+}
+
+// Init callback info
+void InitCallback(_u32 Status, SlDeviceInitInfo_t *DeviceInitInfo)
+{
+
 }
 
 //*****************************************************************************
@@ -1821,7 +1869,7 @@ void* SlWifiConn_process(void* pvParameters)
 /* Static pthread attributes for timer thread - must persist after init returns */
 static pthread_attr_t g_timerThreadAttr;
 
-int SlWifiConn_init(SlWifiConn_AppEventCB_f fWifiAppCB)
+int SlWifiConn_init(SlWifiConn_AppEventCB_f fWifiAppCB, uint8_t deleteProfiles)
 {
     mq_attr            attr;
     sigevent           sev;
@@ -1917,6 +1965,13 @@ int SlWifiConn_init(SlWifiConn_AppEventCB_f fWifiAppCB)
          }
      }
 
+     /* Reset NWP to AP mode, delete all profiles, then stop.
+      * Restart in STA mode for the profile check and normal operation. */
+     if(deleteProfiles) {
+         ResetNWP2AP();
+         sl_Start(0, 0, 0);
+     }
+
      /* Check for stored WLAN profiles before state machine starts.
       * This is safe here since NWP is initialized but SM hasn't started yet.
       */
@@ -2000,6 +2055,13 @@ int SlWifiConn_deinit()
 //! \return None
 //!
 //*****************************************************************************
+void SlWifiConn_setDeleteAllProfiles(void)
+{
+    if(g_ctx != NULL) {
+        g_ctx->bDeleteAllProfiles = true;
+    }
+}
+
 int SlWifiConn_enable(void)
 {
     int retVal;

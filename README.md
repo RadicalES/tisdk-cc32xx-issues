@@ -47,6 +47,14 @@ Four concrete patches to `driver.c` and `spawn.c` with full before/after code, r
 
 Modifications to the `slwificonn.c` connection manager required for stable production operation. Includes timer thread stack overflow fix, exponential backoff on NWP reset, WiFi statistics collection, WLAN profile checking, connected-state reset request, and power policy changes.
 
+### [OCP Shared Registers](ocp-shared-registers.md)
+
+OCP Shared spare registers cannot be safely used by the application processor. Registers 0-2 cause bus faults on read. Registers 6-8 can be read but writing causes NWP power-down/up cycles and instability (747 fatal errors overnight).
+
+### [Provisioning Issues](provisioning-issues.md)
+
+NWP enters unrecoverable state when `sl_WlanProvisioning()` is called after failed WiFi credentials. Profiles must be deleted in AP mode (not STA mode) following the TI out-of-box pattern. SlWifiConn state machine has no clean re-provisioning path.
+
 ### [SPI Driver Error Analysis](cc3220sf-spi-driver-errors.md)
 
 Analysis of the fatal error types (`SYNC_LOSS`, `DRIVER_ABORT`, `NO_CMD_ACK`, `CMD_TIMEOUT`, `DEVICE_ABORT`), their code paths in `driver.c`, and observed error patterns. Includes analysis of conflict between `sl_DeviceStatStart/Get/Stop` APIs and concurrent socket operations.

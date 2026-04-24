@@ -249,7 +249,7 @@ typedef void (*SlWifiConn_Debug_f)(const char *  _format, ...);
     \sa                   SlWifiConn_deinit()
 
 */
-int    SlWifiConn_init(SlWifiConn_AppEventCB_f fWifiAppCB);
+int    SlWifiConn_init(SlWifiConn_AppEventCB_f fWifiAppCB, uint8_t deleteProfiles);
 
 
 /*!
@@ -418,6 +418,13 @@ int    SlWifiConn_registerNetIFCallback(SlNetIf_Event_t fNetIfCB, uint16_t ifId)
     \return                 0 upon success or a negative error code
 */
 int    SlWifiConn_enable(void);
+
+/*!
+    \brief  Set flag to delete all WLAN profiles on next SlWifiConn_enable.
+            Call before SlWifiConn_enable() to clear profiles during startup.
+            The NWP will then enter provisioning mode automatically.
+*/
+void   SlWifiConn_setDeleteAllProfiles(void);
 
 /*!
 
